@@ -11,7 +11,10 @@ app.get('/', function (req, res) {
   res.send('Hello World')
   // console.log(req)
 })
-app.post('/submit', function (req, res) {
+app.post('/signup-submit', function (req, res) {
+  console.log(req.body);
+})
+app.post('/login-submit', function (req, res) {
   console.log(req.body);
 })
 const port=4000;
