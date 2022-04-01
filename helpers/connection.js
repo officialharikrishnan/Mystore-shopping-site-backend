@@ -1,8 +1,16 @@
-var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:27017/mydb";
-
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  console.log("Database created!");
-  db.close();
-});
+const mongoClient=require('mongodb').MongoClient
+const state={
+  db:null
+} 
+module.exports.connect=function(done){
+  const url='mongodb://localhost:27017'
+  const dbname='mystore'
+  mongoClient.connect(url,(err,data)=>{
+    if(err) return done(err)
+    state.db=data.db(dbname)
+    done()
+  })
+}
+module.exports.get=function(){
+  return state.db
+}
