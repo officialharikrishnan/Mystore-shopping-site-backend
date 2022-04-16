@@ -29,16 +29,18 @@ app.get('/admin',(req,res)=>{
 })
 app.post('/addproduct',(req,res)=>{
   upload(req,res,function(err) {
-    //console.log(req.body);
-    //console.log(req.files);
+    // console.log(req.body);
+    const fileInfo=req.body
+    // console.log(req.files);
+    // productHelper.addProduct(req.files)
+    productHelper.addProduct(fileInfo)
     if(err) {
-        return res.end("Error uploading file." + err);
+      res.send({status:"false"})
     }
-    res.end("File is uploaded");
+    res.send({status:"true"});
+    
 });
-    const fileInfo = req.files
-    console.log(fileInfo);
-    console.log(req.body);
+   
 
 
 })
