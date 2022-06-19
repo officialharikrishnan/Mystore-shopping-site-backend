@@ -3,14 +3,17 @@ const app = express()
 var cors = require('cors')
 const bodyParser = require('body-parser');
 var productHelper=require('../helpers/product-helpers') 
-
 app.use(cors());
 // parse application/json
 app.use(bodyParser.json());
 
-app.get('/', function (req, res) {
-    res.send('Hello World')
-    // console.log(req)
+app.get('/home', function (req, res) {
+    console.log(req.body);
+    productHelper.viewProducts().then((products)=>{
+      
+      console.log(products[0].product.image1);
+      res.send({products})
+    })
   })
 app.post('/signup-submit', function (req, res) {
     console.log(req.body);
@@ -18,10 +21,5 @@ app.post('/signup-submit', function (req, res) {
 app.post('/login-submit', function (req, res) {
     console.log(req.body);
   })
- 
-
-
-
-
 
   module.exports=app
