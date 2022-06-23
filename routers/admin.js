@@ -27,6 +27,7 @@ var storage = multer.diskStorage({
   })
   app.post('/addproduct',(req,res)=>{
     upload(req,res,function(err) {
+      console.log(req.files);
       const fileInfo=req.body
       imagename[0]=req.files[0].filename
       if(req.files[1]){
