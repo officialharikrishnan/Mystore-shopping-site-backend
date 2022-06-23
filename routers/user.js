@@ -11,10 +11,14 @@ app.get('/home', function (req, res) {
     console.log(req.body);
     productHelper.viewProducts().then((products)=>{
       
-      console.log(products[0].product.image1);
+      // console.log(products[0].product.image1);
       res.send({products})
     })
   })
+app.get('/uploads/:path',(req,res)=>{
+  res.download('./uploads/'+req.params.path)
+})
+app.use(express.static(__dirname+'/uploads'));  
 app.post('/signup-submit', function (req, res) {
     console.log(req.body);
   })
