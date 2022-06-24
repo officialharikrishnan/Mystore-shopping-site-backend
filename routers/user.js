@@ -2,7 +2,8 @@ const express = require('express')
 const app = express()
 var cors = require('cors')
 const bodyParser = require('body-parser');
-var productHelper=require('../helpers/product-helpers') 
+var productHelper=require('../helpers/product-helpers'); 
+const userHelpers = require('../helpers/user-helpers');
 app.use(cors());
 // parse application/json
 app.use(bodyParser.json());
@@ -20,6 +21,9 @@ app.get('/uploads/:path',(req,res)=>{
 })
 app.use(express.static(__dirname+'/uploads'));  
 app.post('/signup-submit', function (req, res) {
+    userHelpers.doSignup(req.body).then((res)=>{
+      console.log(res);
+    })
     console.log(req.body);
   })
 app.post('/login-submit', function (req, res) {
