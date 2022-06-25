@@ -10,5 +10,28 @@ module.exports={
             })
 
         })
+    },
+    doLogin:(userData)=>{
+        return new Promise(async(resolve,reject)=>{
+            let loginStatus=null
+            let response={}
+            let user=await db.get().collection(collections.USER_COLLECTIONS).findOne({phone:userData.phone})
+            if(user){
+                bcrypt.compare(userData.password,user.password).then((status)=>{
+                    if(status){
+                        response.user=user
+                        response.status=true
+                        resolve(response)
+                    }else{
+                        response.status=false
+                        resolve({status:false})
+                    }
+                })
+            }else{
+                response.status=false
+                resolve({status:false})
+
+            }
+        })
     }
 }

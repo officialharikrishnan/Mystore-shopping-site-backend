@@ -21,13 +21,28 @@ app.get('/uploads/:path',(req,res)=>{
 })
 app.use(express.static(__dirname+'/uploads'));  
 app.post('/signup-submit', function (req, res) {
-    userHelpers.doSignup(req.body).then((res)=>{
-      console.log(res);
+    userHelpers.doSignup(req.body).then((response)=>{
+      console.log(response);
+      res.send("success")
     })
     console.log(req.body);
   })
 app.post('/login-submit', function (req, res) {
-    console.log(req.body);
+    userHelpers.doLogin(req.body).then((response)=>{
+      if(response.status){
+        const userDatas=[
+          response.status,
+          response.user.name,
+          response.user.phone,
+          response.user._id
+        ]
+        console.log(userDatas);
+        res.send({userDatas})
+      }else{
+        res.send({userDatas:false})
+        console.log("login failed");
+      }
+    })
   })
 
   module.exports=app
