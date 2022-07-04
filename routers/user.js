@@ -8,10 +8,9 @@ const userHelpers = require('../helpers/user-helpers');
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use(session({secret:"key",
+app.use(session({secret:"qazwsxedcrfvtgbyhnujm",
                 resave:true,
                 saveUninitialized:true,
-                DateTime: Date.now()
               }))
 
 
@@ -44,7 +43,7 @@ app.post('/login-submit', function (req, res) {
   userHelpers.doLogin(req.body).then((response) => {
     req.session.user=response.user
     if (response.status) {
-      userHelpers.sessionCreate(req.session)
+      userHelpers.sessionCreate(req.session.user)
       const userDatas = [
         response.status,
         response.user.name,
