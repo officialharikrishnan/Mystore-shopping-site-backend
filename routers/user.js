@@ -1,11 +1,23 @@
 const express = require('express')
 const app = express()
 var cors = require('cors')
+const session = require("express-session");
 const bodyParser = require('body-parser');
 var productHelper = require('../helpers/product-helpers');
 const userHelpers = require('../helpers/user-helpers');
 app.use(cors());
 app.use(bodyParser.json());
+
+app.use(session({secret:"key",
+                resave:true,
+                saveUninitialized:true,
+                DateTime: Date.now()
+              }))
+
+
+
+
+
 app.get('/',function (req, res) {
     productHelper.viewProducts().then((products) => {
       res.send({ products })
@@ -30,7 +42,9 @@ app.post('/signup-submit', function (req, res) {
 })
 app.post('/login-submit', function (req, res) {
   userHelpers.doLogin(req.body).then((response) => {
+    req.session.user=response.user
     if (response.status) {
+      userHelpers.sessionCreate(req.session)
       const userDatas = [
         response.status,
         response.user.name,

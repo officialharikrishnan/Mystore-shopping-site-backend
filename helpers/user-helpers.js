@@ -33,5 +33,14 @@ module.exports={
 
             }
         })
+    },
+    sessionCreate:(sessionData)=>{
+        console.log(sessionData);
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collections.USER_SESSIONS).insertOne({sessionData,"DateTime": new Date()}).then((res)=>{
+                resolve(res)
+            })
+        }),
+        db.get().collection(collections.USER_SESSIONS).createIndex( { "DateTime": 1 }, { expireAfterSeconds: 60 } )
     }
 }
