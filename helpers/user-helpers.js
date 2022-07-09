@@ -19,6 +19,7 @@ module.exports={
             if(user){
                 bcrypt.compare(userData.password,user.password).then((status)=>{
                     if(status){
+                        
                         response.user=user
                         response.status=true
                         resolve(response)
@@ -36,11 +37,16 @@ module.exports={
     },
     sessionCreate:(sessionData)=>{
         console.log(sessionData);
-        return new Promise((resolve,reject)=>{
-            db.get().collection(collections.USER_SESSIONS).insertOne({sessionData,"DateTime": new Date()}).then((res)=>{
-                resolve(res)
+        let result;
+        return new Promise(async(resolve,reject)=>{
+         await   db.get().collection(collections.USER_SESSIONS).insertOne({sessionData,"DateTime": new Date()}).then((res)=>{
+                if(res){
+                    db.get().collection(collections.USER_SESSIONS).createIndex( { "DateTime": 1 }, { expireAfterSeconds: 60 } )
+                    result=res.insertedId.toString()
+                    console.log(">>",result);
+                    resolve(result)
+                }
             })
-        }),
-        db.get().collection(collections.USER_SESSIONS).createIndex( { "DateTime": 1 }, { expireAfterSeconds: 60 } )
+        })
     }
 }

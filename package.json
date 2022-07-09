@@ -10,7 +10,8 @@
     "mongodb": "^4.4.1",
     "multer": "^1.4.4",
     "nodemon": "^2.0.15",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "universal-cookie-express": "^4.0.3"
   },
   "scripts": {
     "start": "nodemon app.js"
