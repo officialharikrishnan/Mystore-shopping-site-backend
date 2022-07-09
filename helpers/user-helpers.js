@@ -43,7 +43,6 @@ module.exports={
                 if(res){
                     db.get().collection(collections.USER_SESSIONS).createIndex( { "DateTime": 1 }, { expireAfterSeconds: 60 } )
                     result=res.insertedId.toString()
-                    console.log(">>",result);
                     resolve(result)
                 }
             })
