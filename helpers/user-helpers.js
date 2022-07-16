@@ -72,6 +72,7 @@ module.exports={
                     $push:{product:ObjectId(proId)}
                 }
                 ).then((response)=>{
+                    console.log(response);
                     resolve()
                 })
                 
@@ -81,6 +82,7 @@ module.exports={
                     product:[ObjectId(proId)]
                 }
                 db.get().collection(collections.CART_COLLECTIONS).insertOne(cartObj).then((response)=>{
+                    console.log(response);
                     resolve()
                 })
             }

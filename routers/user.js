@@ -71,11 +71,15 @@ app.post('/login-submit', function (req, res) {
   })
 })
 app.get('/cart/:id',(req,res)=>{
+  let proId=req.params.id;
   if(req.cookies.mystore){
-    console.log("called");
-    let userId=req.cookies.mystore;
-    let proId=req.params.id;
-    userHelpers.addToCart(proId,userId).then((response)=>{
+    let userId;
+    let cookieId=req.cookies.mystore;
+    userHelpers.getSession(cookieId).then((response)=>{
+      userId=response.sessionData._id.toString()
+      console.log(">>",userId);
+      userHelpers.addToCart(proId,userId).then((response)=>{
+      }) 
     })
   }else{
     console.log("nothing");
