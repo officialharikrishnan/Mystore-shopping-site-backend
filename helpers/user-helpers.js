@@ -1,6 +1,7 @@
 var db=require('./connection')
 var collections=require('./collections')
 const bcrypt=require('bcrypt')
+const { ObjectId } = require('mongodb')
 module.exports={
     doSignup:(userData)=>{
         return new Promise(async(resolve,reject)=>{
@@ -18,8 +19,7 @@ module.exports={
             let user=await db.get().collection(collections.USER_COLLECTIONS).findOne({phone:userData.phone})
             if(user){
                 bcrypt.compare(userData.password,user.password).then((status)=>{
-                    if(status){
-                        
+                    if(status){ 
                         response.user=user
                         response.status=true
                         resolve(response)
@@ -38,14 +38,52 @@ module.exports={
     sessionCreate:(sessionData)=>{
         console.log(sessionData);
         let result;
+        let i=1;
         return new Promise(async(resolve,reject)=>{
          await   db.get().collection(collections.USER_SESSIONS).insertOne({sessionData,"DateTime": new Date()}).then((res)=>{
                 if(res){
-                    db.get().collection(collections.USER_SESSIONS).createIndex( { "DateTime": 1 }, { expireAfterSeconds: 60 } )
+                    i++;
+                    db.get().collection(collections.USER_SESSIONS).createIndex( { "DateTime": i }, { expireAfterSeconds: 120 } )
                     result=res.insertedId.toString()
                     resolve(result)
                 }
             })
+        })
+    },
+    getSession:(sessionId)=>{
+        return new Promise(async(resolve,reject)=>{
+             let sessionResult =await db.get().collection(collections.USER_SESSIONS).findOne({_id:ObjectId(sessionId)})
+            if(sessionResult._id){
+                sessionResult.status=true,
+                resolve(sessionResult)
+            }else{
+                sessionResult.status=false
+                resolve(sessionResult)
+            }
+        })
+    },
+    addToCart:(proId,userId)=>{
+        // console.log(">>>>",proId,userId);
+        return new Promise(async(resolve,reject)=>{
+            let userCart=await db.get().collection(collections.CART_COLLECTIONS).findOne({user:ObjectId(userId)})
+            if(userCart){
+                db.get().collection(collections.CART_COLLECTIONS).updateOne({user:ObjectId(userId)},
+                {
+                    $push:{product:ObjectId(proId)}
+                }
+                ).then((response)=>{
+                    resolve()
+                })
+                
+            }else{
+                let cartObj={
+                    user:ObjectId(userId),
+                    product:[ObjectId(proId)]
+                }
+                db.get().collection(collections.CART_COLLECTIONS).insertOne(cartObj).then((response)=>{
+                    resolve()
+                })
+            }
         })
     }
 }

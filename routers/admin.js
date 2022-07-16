@@ -20,11 +20,11 @@ var storage = multer.diskStorage({
       const filetype=path.extname(file.originalname);
       callback(null, file.fieldname + '' + Date.now()+filetype)
     }
-  });
+  }); 
   var upload = multer({ storage: storage }).array('image1',2);
   app.get('/admin',(req,res)=>{
     res.send("admin")
-  })
+  }) 
   app.post('/addproduct',(req,res)=>{
     upload(req,res,function(err) {
       console.log(req.files);
