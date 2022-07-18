@@ -46,7 +46,7 @@ module.exports={
                     db.get().collection(collections.USER_SESSIONS).createIndex( { "DateTime": i }, { expireAfterSeconds: 120 } )
                     result=res.insertedId.toString()
                     resolve(result)
-                }
+                } 
             })
         })
     },
@@ -82,10 +82,35 @@ module.exports={
                     product:[ObjectId(proId)]
                 }
                 db.get().collection(collections.CART_COLLECTIONS).insertOne(cartObj).then((response)=>{
-                    console.log(response);
-                    resolve()
+                    resolve(response)
                 })
             }
+        })
+    },
+    getCartItems:(userId)=>{
+        return new Promise(async(resolve,reject)=>{
+            let cartItems = await db.get().collection(collections.CART_COLLECTIONS).aggregate([
+                {
+                    $match:{user:userId}
+                },
+                {
+                    $lookup:{
+                        from:collections.PRODUCT_COLLECTIONS,
+                        let:{proList:'$product'},
+                        pipeline:[
+                            {
+                                $match:{
+                                    $expr:{
+                                        $in:['$_id','$$proList']
+                                    }
+                                }
+                            }
+                        ],
+                        as:'cartItems'
+                    }
+                }
+            ]).toArray()
+            resolve(cartItems[0].cartItems)
         })
     }
 }

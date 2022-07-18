@@ -13,14 +13,9 @@ let cookieValue=""
 var loginStatus;
 
 app.get('/', function (req, res) {
-//   if(req.cookies.mystore){
-//   console.log(req.cookies.mystore);
-// }
   productHelper.viewProducts().then((products) => {
-    // {loginStatus && res.send({products})}
     res.send({products})
-  })
-  // console.log("home",loginStatus); 
+  }) 
 }) 
 app.get('/viewoneproduct/:id', function (req, res) {
   if(req.cookies){
@@ -59,12 +54,12 @@ app.post('/login-submit', function (req, res) {
         cookieValue = response
       })
       function setCookie() {
-        res.status(202).cookie("mystore", `${cookieValue}`, { sameSite: 'strict', path: '/', expires: new Date(new Date().getTime() + 120 * 1000), httpOnly: true })
+        res.status(202).cookie("mystore", `${cookieValue}`, { sameSite: 'strict', path: '/', expires: new Date(new Date().getTime() + 1200 * 1000), httpOnly: true })
         res.send({ userDatas })
         let date=new Date().getMilliseconds()
         console.log("loggedin ",date,loginStatus)
       }
-    } else {
+    } else { 
       res.send({ userDatas: false })
       console.log("login failed");
     }
@@ -79,12 +74,33 @@ app.get('/cart/:id',(req,res)=>{
       userId=response.sessionData._id.toString()
       console.log(">>",userId);
       userHelpers.addToCart(proId,userId).then((response)=>{
+        console.log(response);
+        if(response){
+          res.send({status:true})
+        }else{
+          res.send({status:false})
+        }
       }) 
     })
   }else{
     console.log("nothing");
   } 
-  
-
+})  
+app.get('/get-cart',(req,res)=>{
+  if(req.cookies.mystore){
+    cookieId=req.cookies.mystore
+    userHelpers.getSession(cookieId).then((response)=>{
+      userId=response.sessionData._id
+      userHelpers.getCartItems(userId).then((products)=>{
+        console.log(">>>>>>>>>>>>>",products);
+        if(products){
+          console.log(products);
+          res.send({products})
+        }else{
+          res.send({})
+        }
+      })
+    })
+  }
 })
 module.exports = app
