@@ -7,7 +7,7 @@ var productHelper = require('../helpers/product-helpers');
 const userHelpers = require('../helpers/user-helpers');
 
 app.use(cors({credentials:true,origin:'http://localhost:3000'}));
-app.use(bodyParser.json());
+app.use(bodyParser.json()); 
 app.use(cookieParser());
 let cookieValue=""
 var loginStatus;
@@ -15,8 +15,23 @@ var loginStatus;
 app.get('/', function (req, res) {
   productHelper.viewProducts().then((products) => {
     res.send({products})
-  }) 
+  })  
 }) 
+app.get('/user',(req,res)=>{
+  let cookieId=req.cookies.mystore
+  if(cookieId){ 
+    userHelpers.getSession(cookieId).then((response)=>{
+      if(response){
+          let userDatas=response.sessionData
+          productHelper.viewProducts().then((products) => {
+            res.send({products,userDatas,status:true})
+          })
+        }else{
+          res.send({status:false})
+        }
+      })
+    }
+})
 app.get('/viewoneproduct/:id', function (req, res) {
   if(req.cookies){
     console.log(req.cookies);
@@ -63,6 +78,16 @@ app.post('/login-submit', function (req, res) {
       res.send({ userDatas: false })
       console.log("login failed");
     }
+  })
+})
+app.get('/logout',(req,res)=>{
+  cookieId=req.cookies.mystore;
+  userHelpers.deleteSession(cookieId).then((response)=>{
+      if(response){
+        res.send({status:true})
+      }else{
+        res.send({status:false})
+      }
   })
 })
 app.get('/cart/:id',(req,res)=>{

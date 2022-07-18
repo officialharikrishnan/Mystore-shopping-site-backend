@@ -51,16 +51,25 @@ module.exports={
         })
     },
     getSession:(sessionId)=>{
+        let sessionResult={status:false}
+
         return new Promise(async(resolve,reject)=>{
-             let sessionResult =await db.get().collection(collections.USER_SESSIONS).findOne({_id:ObjectId(sessionId)})
-            if(sessionResult._id){
+              sessionResult =await db.get().collection(collections.USER_SESSIONS).findOne({_id:ObjectId(sessionId)})
+            if(sessionResult){
                 sessionResult.status=true,
                 resolve(sessionResult)
             }else{
-                sessionResult.status=false
                 resolve(sessionResult)
             }
         })
+    },
+    deleteSession:(sessionId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collections.USER_SESSIONS).remove({_id:ObjectId(sessionId)}).then((response)=>{
+                resolve(response)
+            })
+        })
+
     },
     addToCart:(proId,userId)=>{
         // console.log(">>>>",proId,userId);
