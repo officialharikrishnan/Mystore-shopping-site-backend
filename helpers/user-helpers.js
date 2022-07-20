@@ -42,8 +42,8 @@ module.exports={
         return new Promise(async(resolve,reject)=>{
          await   db.get().collection(collections.USER_SESSIONS).insertOne({sessionData,"DateTime": new Date()}).then((res)=>{
                 if(res){
-                    i++;
-                    db.get().collection(collections.USER_SESSIONS).createIndex( { "DateTime": i }, { expireAfterSeconds: 120 } )
+                    i=i+2
+                    db.get().collection(collections.USER_SESSIONS).createIndex( { "DateTime": i }, { expireAfterSeconds: 60 * 60 * 24 } )
                     result=res.insertedId.toString()
                     resolve(result)
                 } 
@@ -60,7 +60,7 @@ module.exports={
                 resolve(sessionResult)
             }else{
                 resolve(sessionResult)
-            }
+            } 
         })
     },
     deleteSession:(sessionId)=>{
@@ -119,7 +119,12 @@ module.exports={
                     }
                 }
             ]).toArray()
-            resolve(cartItems[0].cartItems)
+            if(cartItems[0]==undefined){
+                resolve(null)
+            }else{
+                resolve(cartItems[0].cartItems)
+
+            }
         })
     }
 }

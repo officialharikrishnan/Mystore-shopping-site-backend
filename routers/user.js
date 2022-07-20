@@ -113,19 +113,44 @@ app.get('/cart/:id',(req,res)=>{
 })  
 app.get('/get-cart',(req,res)=>{
   if(req.cookies.mystore){
-    cookieId=req.cookies.mystore
-    userHelpers.getSession(cookieId).then((response)=>{
-      userId=response.sessionData._id
-      userHelpers.getCartItems(userId).then((products)=>{
-        console.log(">>>>>>>>>>>>>",products);
-        if(products){
-          console.log(products);
-          res.send({products})
+   let cookieId=req.cookies.mystore
+    if(cookieId){
+      userHelpers.getSession(cookieId).then((response)=>{
+        if(response){
+          console.log(response);
+          userId=response.sessionData._id 
+          sessionData=response.sessionData
+          userHelpers.getCartItems(userId).then((products)=>{
+            if(products){
+              res.send({products,sessionData,status:true,cartItems:true})
+            }else{
+              res.send({cartItems:false,status:true,sessionData})
+            }
+          })
         }else{
-          res.send({})
+
         }
       })
+    }else{
+
+    }
+  }
+})
+app.get('/profile',(req,res)=>{
+  let cookieId=req.cookies.mystore
+  if(cookieId){
+    userHelpers.getSession(cookieId).then((response)=>{
+      if(response){
+        let userData = response.sessionData
+        console.log(userData);
+        res.send({userData,status:true})
+      }else{
+        res.send({status:false})
+
+      }
     })
+  }else{
+
   }
 })
 module.exports = app
