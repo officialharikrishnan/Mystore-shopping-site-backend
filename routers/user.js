@@ -30,7 +30,7 @@ app.get('/user',(req,res)=>{
           res.send({status:false})
         }
       })
-    }
+    } 
 })
 app.get('/viewoneproduct/:id', function (req, res) {
   if(req.cookies){

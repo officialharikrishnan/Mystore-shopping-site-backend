@@ -7,7 +7,8 @@ var imagename=[0,1]
 const multer = require("multer")
 var upload=multer();
 const path = require('path');
-app.use(cors());
+const userHelpers = require('../helpers/user-helpers');
+app.use(cors({credentials:true,origin:'http://localhost:3000'}));
 // parse application/json
 app.use(bodyParser.json());
 
@@ -22,10 +23,27 @@ var storage = multer.diskStorage({
     }
   }); 
   var upload = multer({ storage: storage }).array('image1',2);
-  app.get('/admin',(req,res)=>{
-    res.send("admin")
+app.post("/adminsignup",(req,res)=>{
+  userHelpers.doAdminSignup(req.body).then((response)=>{
+    console.log(response);
+  })
+})
+app.post('/adminlogin-submit',(req,res)=>{
+  // console.log("body>",req.body);
+  userHelpers.doAdminLogin(req.body).then((response)=>{
+    if(response._id){
+      res.send({response,status:true})
+    }else{
+      res.send({status:false})
+    }
+  })
+})  
+app.get('/admin',(req,res)=>{
+    productHelper.viewProducts().then((products) => {
+      res.send({products})
+    })  
   }) 
-  app.post('/addproduct',(req,res)=>{
+app.post('/addproduct',(req,res)=>{
     upload(req,res,function(err) {
       console.log(req.files);
       const fileInfo=req.body
@@ -46,5 +64,33 @@ var storage = multer.diskStorage({
 
 });
 
+})
+app.get('/getproduct/:id',(req,res)=>{
+  productHelper.viewOneProduct(req.params.id).then((response) => {
+    console.log(response);
+    res.send(response)
+  })
+})
+app.post('/updateproduct',(req,res)=>{
+  
+})
+app.get('/deleteproduct/:id',(req,res)=>{
+  console.log(req.params.id);
+  productHelper.deleteProduct(req.params.id).then((response)=>{
+    if(response){
+      res.send({status:true})
+    }else{
+      res.send({status:false})
+    }
+  })
+})
+app.get('/getallusers',(req,res)=>{
+  userHelpers.getAllUsers().then((response)=>{
+    if(response){
+      res.send({users:response})
+    }else{
+      res.send({users:false})
+    }
+  })
 })
 module.exports=app

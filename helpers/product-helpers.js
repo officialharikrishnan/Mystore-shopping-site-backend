@@ -27,5 +27,12 @@ module.exports={
                 console.log("an errrorrr");
             }
         })
+    },
+    deleteProduct:(productId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collections.PRODUCT_COLLECTIONS).remove({_id:ObjectId(productId)}).then((response)=>{
+                resolve(response)
+            })
+        })
     }
 }

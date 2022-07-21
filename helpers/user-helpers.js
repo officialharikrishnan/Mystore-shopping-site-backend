@@ -3,6 +3,34 @@ var collections=require('./collections')
 const bcrypt=require('bcrypt')
 const { ObjectId } = require('mongodb')
 module.exports={
+    doAdminSignup:(adminData)=>{
+        return new Promise(async(resolve,reject)=>{
+            adminData.password=await bcrypt.hash(adminData.password,10)
+            db.get().collection(collections.ADMIN_COLLECTIONS).insertOne(adminData).then((response)=>{
+                console.log(response);
+                resolve(response)
+            })
+        })
+    },
+    doAdminLogin:(adminData)=>{
+        let response={}
+        return new Promise(async(resolve,reject)=>{
+            let admin=await db.get().collection(collections.ADMIN_COLLECTIONS).findOne({phone:adminData.phone})
+            if(admin){
+                bcrypt.compare(adminData.password,admin.password).then((response)=>{
+                    if(response){
+                        resolve(admin)
+                    }else{
+                        response.status=false
+                        resolve(response)
+                    }
+                })
+            }else{
+                response.status=false
+                resolve(response)
+            }
+        })
+    },
     doSignup:(userData)=>{
         return new Promise(async(resolve,reject)=>{
             userData.password=await bcrypt.hash(userData.password,10)
@@ -125,6 +153,13 @@ module.exports={
                 resolve(cartItems[0].cartItems)
 
             }
+        })
+    },
+    getAllUsers:()=>{
+        return new Promise(async(resolve,reject)=>{
+           let users =await db.get().collection(collections.USER_COLLECTIONS).find().toArray()
+           console.log(users);
+            resolve(users)
         })
     }
 }
