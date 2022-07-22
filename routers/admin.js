@@ -11,7 +11,7 @@ const userHelpers = require('../helpers/user-helpers');
 app.use(cors({credentials:true,origin:'http://localhost:3000'}));
 // parse application/json
 app.use(bodyParser.json());
-
+let cookieValue=""
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
         
@@ -32,16 +32,37 @@ app.post('/adminlogin-submit',(req,res)=>{
   // console.log("body>",req.body);
   userHelpers.doAdminLogin(req.body).then((response)=>{
     if(response._id){
-      res.send({response,status:true})
+      const adminDatas=[
+        response.name,
+        response.phone,
+        response._id
+      ]
+      setTimeout(setCookie, 300)
+      userHelpers.sessionCreate(response).then((response)=>{
+        cookieValue=response
+      })
+      function setCookie(){
+        res.status(202).cookie("mystoreAdmin", `${cookieValue}`, { sameSite: 'strict', path: '/', expires: new Date(new Date().getTime() + 1200 * 1000), httpOnly: true })
+        res.send({ adminDatas })
+      }
     }else{
-      res.send({status:false})
+      res.send({adminDatas:false})
     }
   })
 })  
 app.get('/admin',(req,res)=>{
-    productHelper.viewProducts().then((products) => {
-      res.send({products})
-    })  
+    console.log(req.cookies.mystoreAdmin);
+    userHelpers.getSession(req.cookies.mystoreAdmin).then((response)=>{
+      console.log(response);
+      if(response){
+        let adminDatas=response.sessionData
+        productHelper.viewProducts().then((products) => {
+          res.send({products,adminDatas,status:true})
+        })  
+      }else{
+        res.send({status:false})
+      }
+    })
   }) 
 app.post('/addproduct',(req,res)=>{
     upload(req,res,function(err) {
@@ -85,11 +106,19 @@ app.get('/deleteproduct/:id',(req,res)=>{
   })
 })
 app.get('/getallusers',(req,res)=>{
-  userHelpers.getAllUsers().then((response)=>{
+  userHelpers.getSession(req.cookies.mystoreAdmin).then((response)=>{
     if(response){
-      res.send({users:response})
+      let adminDatas=response.sessionData
+
+      userHelpers.getAllUsers().then((response)=>{
+        if(response){
+          res.send({users:response,adminDatas,status:true})
+        }else{
+          res.send({users:false})
+        }
+      })
     }else{
-      res.send({users:false})
+      res.send({status:false})
     }
   })
 })
