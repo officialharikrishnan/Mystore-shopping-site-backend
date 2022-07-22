@@ -122,4 +122,14 @@ app.get('/getallusers',(req,res)=>{
     }
   })
 })
+app.get('/admin-logout',(req,res)=>{
+  console.log(req.cookies.mystoreAdmin);
+  userHelpers.deleteSession(req.cookies.mystoreAdmin).then((response)=>{
+    if(response){
+      res.send({status:true})
+    }else{
+      res.send({status:false})
+    }
+})
+})
 module.exports=app

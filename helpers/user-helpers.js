@@ -32,10 +32,22 @@ module.exports={
         })
     },
     doSignup:(userData)=>{
+        let response={}
         return new Promise(async(resolve,reject)=>{
             userData.password=await bcrypt.hash(userData.password,10)
             db.get().collection(collections.USER_COLLECTIONS).insertOne(userData).then((data)=>{
-                resolve(data)
+                if(data){
+                    response.user={
+                        name:userData.name,
+                        phone:userData.phone,
+                        address:userData.address
+                    }
+                    response.status=true
+                    resolve(response)
+                }else{
+                    response.status=false
+                    resolve(response)
+                }
             })
 
         })

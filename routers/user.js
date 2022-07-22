@@ -18,6 +18,7 @@ app.get('/', function (req, res) {
   })  
 }) 
 app.get('/user',(req,res)=>{
+  console.log("callled");
   let cookieId=req.cookies.mystore
   if(cookieId){ 
     userHelpers.getSession(cookieId).then((response)=>{
@@ -30,7 +31,9 @@ app.get('/user',(req,res)=>{
           res.send({status:false})
         }
       })
-    } 
+    }else{
+      res.send({status:false})
+    }
 })
 app.get('/viewoneproduct/:id', function (req, res) {
   if(req.cookies){
@@ -49,10 +52,21 @@ app.get('/uploads/:path', (req, res) => {
 })
 app.post('/signup-submit',function (req, res) {
   userHelpers.doSignup(req.body).then((response) => {
-    console.log(response);
-    res.send("success")
+    console.log(response)
+    if(response){
+      userData = response.user
+      setTimeout(setCookie, 500)
+      userHelpers.sessionCreate(userData).then((response) => {
+        cookieValue = response
+      })
+      function setCookie() {
+        res.status(202).cookie("mystore", `${cookieValue}`, { sameSite: 'strict', path: '/', expires: new Date(new Date().getTime() + 1200 * 1000), httpOnly: true })
+        res.send({ userData ,status:true })
+      }
+    }else{
+      res.send({status:false})
+    }
   })
-  console.log(req.body);
 })
 app.post('/login-submit', function (req, res) {
   userHelpers.doLogin(req.body).then((response) => {
@@ -71,8 +85,6 @@ app.post('/login-submit', function (req, res) {
       function setCookie() {
         res.status(202).cookie("mystore", `${cookieValue}`, { sameSite: 'strict', path: '/', expires: new Date(new Date().getTime() + 1200 * 1000), httpOnly: true })
         res.send({ userDatas })
-        let date=new Date().getMilliseconds()
-        console.log("loggedin ",date,loginStatus)
       }
     } else { 
       res.send({ userDatas: false })
